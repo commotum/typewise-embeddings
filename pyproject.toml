@@ -1,0 +1,17 @@
+[project]
+name = "typewise-embeddings"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "JP", email = "jneilpeterson@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+typewise-embeddings = "typewise_embeddings:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
