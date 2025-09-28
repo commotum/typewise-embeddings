@@ -36,7 +36,7 @@ This turns “table lookup” into **structured math**—the parameters scale wi
 
 $$
 \underbrace{Y}_{d_{\text{model}}}
-= \mathrm{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
+= \operatorname{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
 \quad N_q = d_{\text{model}}/4.
 $$
 
@@ -73,7 +73,7 @@ Each type (t) has its learned quaternions ($W^{(t)}_i$). “Undo” each code to
 
 $$
 \widehat{q}_i = \widehat{y}_i \otimes \big(W^{(t)}_i\big)^{-1}
-= \widehat{y}_i \otimes \frac{\mathrm{conj}(W^{(t)}_i)}{\lvert W^{(t)}_i\rvert^2}.
+= \widehat{y}_i \otimes \frac{\operatorname{conj}(W^{(t)}_i)}{\lvert W^{(t)}_i\rvert^2}.
 $$
 
 **3) Fuse votes → best guess + confidence**
@@ -82,7 +82,7 @@ $$
 
 $$
 \boxed{\mu_q =
-\frac{\sum_i \widehat{y}_i \otimes \mathrm{conj}(W^{(t)}_i)}
+\frac{\sum_i \widehat{y}_i \otimes \operatorname{conj}(W^{(t)}_i)}
 {\sum_i \lvert W^{(t)}_i\rvert^2}}
 $$
 
@@ -102,7 +102,7 @@ $$
 * **Score** each candidate color ($c$) by how well it explains the clues:
 
 $$
-\text{Score}(c) = -\sum_i \big\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\big\rvert^2.
+\operatorname{Score}(c) = -\sum_i \left\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\right\rvert^2.
 $$
 
 * Take **top‑k** or **sample** by a softmax over these scores.
@@ -143,11 +143,11 @@ $$
 * Step size is exactly $2/256 = 1/128$ on $[-1,1]$.
 * Powers‑of‑two grid aligns with **bf16** spacing; adjacent 8‑bit codes remain distinct.
 
-**Map back to 8‑bit after decoding $\widehat{Q}=[0,\hat r,\hat g,\hat b]$:**
+**Map back to 8‑bit after decoding $\widehat{Q}=[0,\hat{r},\hat{g},\hat{b}]$:**
 
 $$
-\widehat{r}_{\text{8-bit}}=\operatorname{round}\!\left(\frac{256\,\hat r + 255}{2}\right)
-\quad\text{(and same for $g,b$); clamp to $[0,255]$.}
+\widehat{r}_{\text{8-bit}} = \operatorname{round}\!\left(\frac{256\,\hat{r} + 255}{2}\right)
+\quad\text{(and same for }g,b\text{; clamp to }[0,255]\text{).}
 $$
 
 ---
@@ -202,14 +202,14 @@ def decode_mu_and_spread(h_T, W_t, eps=1e-12):
 
 Use `mu_q` as the continuous estimate; do small **local search** in 8‑bit space and **rank** candidates by how well they re‑explain the blocks:
 $$
--\sum_i \big\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\big\rvert^2.
+-\sum_i \left\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\right\rvert^2.
 $$
 
 ---
 
 ## Design choices (defaults we recommend)
 
-* **d_type, d_value:** choose both divisible by 4 (e.g., $d_{\text{type}}=128$, $d_{\text{value}}=3968$ for $d_{\text{model}}=4096$).
+* **`d_type`, `d_value`:** choose both divisible by 4 (e.g., $d_{\text{type}}=128$, $d_{\text{value}}=3968$ for $d_{\text{model}}=4096$).
 * **Type mapping:** give each type a small **codebook** in quaternion space (often just one pure‑imaginary unit quaternion per type works); decode the type segment with the same voting mechanism, then pick the **nearest code** (tiny set).
 * **Neighborhood size for top‑k RGB:** $m=7$ bins per channel (≤ 343 candidates) is a good start.
 * **Dtypes:** activations/weights in **bf16**, reductions in **fp32**.
@@ -220,8 +220,8 @@ $$
 
 * **Typewise Token** — a token represented as **(TYPE, VALUE)**.
 * **Minimal Representation (MR)** — the smallest structured form of a value (e.g., one **pure‑imaginary quaternion** ($[0,r,g,b]$) for RGB).
-* **Weight Bank** — per‑type list of learned **quaternions** ($W^{(t)}_{1..N_q}$) used for up‑projection.
-* **Quaternion Lift / Up‑Projection** — compute $Y = \mathrm{vec}\big(q \otimes W^{(t)}_i\big)_{i=1}^{N_q}$ to reach $d_{\text{model}}$.
+* **Weight Bank** — per‑type list of learned **quaternions** ($W^{(t)}_{1,\dots,N_q}$) used for up‑projection.
+* **Quaternion Lift / Up‑Projection** — compute $Y = \operatorname{vec}\big(q \otimes W^{(t)}_i\big)_{i=1}^{N_q}$ to reach $d_{\text{model}}$.
 * **(Type|Value) Segment** — the slice of the hidden state reserved for decoding TYPE or VALUE (each a multiple of 4 dims).
 * **Block** — a 4‑D slice of a segment; corresponds to one quaternion.
 * **Vote** — per‑block inverse estimate of the value: $\widehat{q}_i = \widehat{y}_i \otimes (W^{(t)}_i)^{-1}$.
