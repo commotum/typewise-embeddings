@@ -30,7 +30,7 @@ This turns “table lookup” into **structured math**—the parameters scale wi
 * ❌ **Replace:** “learned embedding table with one row per token.”
 * ✅ **With:** three pieces per **type**:
 
-  1. **Type set** (what kinds of tokens exist).
+  1. **Type set** $\mathcal{T}$ (what kinds of tokens exist).
   2. **Mapping function** from a concrete value to its **Minimal Representation** (MR), usually one quaternion (4 numbers).
   3. **Weight Bank** $\left(W^{(t)}_{1,\dots,N_q}\right)$ (quaternions) for the type, used to **up‑project** the MR to the model dimension by blockwise Hamilton products:
 
@@ -125,7 +125,7 @@ You can allocate fixed slices of the hidden state for **type** and **value** and
   * $W^{(t)}$ for the **value** segment (conditioned on which type you decoded).
 * **Decode TYPE** first from its segment using the same per‑block voting. Then use that predicted type to select the value Weight Bank and **decode VALUE** from its segment.
 
-Because the number of types is small, picking the discrete type from the type decoder’s $\mu_q$ is trivial (nearest code or small softmax over the type set).
+Because $|\mathcal{T}|$ is small, picking the discrete type from the type decoder’s $\mu_q$ is trivial (nearest code or a small softmax over the type set $\mathcal{T}$).
 
 ---
 
@@ -223,6 +223,7 @@ $$
 
 * **Typewise Token** — a token represented as **(TYPE, VALUE)**.
 * **$\mathcal{V}$** — the set of discrete values (vocabulary) for the relevant type; $|\mathcal{V}|$ is its size.
+* **$\mathcal{T}$** — the set of types; $|\mathcal{T}|$ is its size.
 * **Minimal Representation (MR)** — the smallest structured form of a value (e.g., one **pure‑imaginary quaternion** ($[0,r,g,b]$) for RGB).
 * **Weight Bank** — per‑type list of learned **quaternions** $\left(W^{(t)}_{1,\dots,N_q}\right)$ used for up‑projection.
 * **Quaternion Lift / Up‑Projection** — compute $Y = \mathrm{vec}\big(q \otimes W^{(t)}_i\big)_{i=1}^{N_q}$ to reach $d_{\text{model}}$.
