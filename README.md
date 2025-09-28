@@ -7,7 +7,7 @@ Traditional LLMs predict the next token by comparing their final hidden vector a
 * **RGB** has **16,777,216** distinct values.
 * **int64** has ≈ **9.22×10¹⁸** values.
 
-A row‑per‑value embedding table (and a V‑way softmax) explodes in size and compute.
+A row‑per‑value embedding table (and a $|\mathcal{V}|$‑way softmax; where $|\mathcal{V}|$ is the number of discrete values) explodes in size and compute.
 
 ---
 
@@ -19,7 +19,7 @@ Represent each token as **(type, value)** and **never** build a row‑per‑valu
 * Each **value** is mapped to a tiny **minimal representation** (often a single quaternion).
 * A fast **up‑projection** (Hamilton product) lifts that 4‑D minimal representation into the model dimension.
 
-This turns “table lookup” into **structured math**—the parameters scale with **model dimension**, not with **#values**.
+This turns “table lookup” into **structured math**—the parameters scale with **model dimension**, not with $|\mathcal{V}|$.
 
 ---
 
@@ -44,7 +44,7 @@ $$
 
 **Output side (prediction):**
 
-* ❌ **Replace:** “V‑way softmax against every value’s embedding.”
+* ❌ **Replace:** “$|\mathcal{V}|$‑way softmax against every value’s embedding.”
 * ✅ **With:** a **quaternion voting decoder** that:
 
   1. **Splits** the final hidden state ($h_T$) into 4‑D blocks.
@@ -167,7 +167,7 @@ Everything autograds cleanly (just quaternion ops over real tensors).
 
 ## Why this works
 
-* Complexity is **$O(d_{\text{model}})$**, not $O(|\text{values}|)$.
+* Complexity is **$O(d_{\text{model}})$**, not $O(|\mathcal{V}|)$.
 * The decoder gives a **best guess and a confidence**, not just a number.
 * No giant tables; **no enumeration** over 16.7M colors—ever.
 
@@ -222,6 +222,7 @@ $$
 ## Glossary
 
 * **Typewise Token** — a token represented as **(TYPE, VALUE)**.
+* **$\mathcal{V}$** — the set of discrete values (vocabulary) for the relevant type; $|\mathcal{V}|$ is its size.
 * **Minimal Representation (MR)** — the smallest structured form of a value (e.g., one **pure‑imaginary quaternion** ($[0,r,g,b]$) for RGB).
 * **Weight Bank** — per‑type list of learned **quaternions** $\left(W^{(t)}_{1,\dots,N_q}\right)$ used for up‑projection.
 * **Quaternion Lift / Up‑Projection** — compute $Y = \mathrm{vec}\big(q \otimes W^{(t)}_i\big)_{i=1}^{N_q}$ to reach $d_{\text{model}}$.
