@@ -55,6 +55,7 @@ $$
 > **No anchors. No extra readout.** We directly use the final hidden state ($h_T$) as the source of block clues; training makes the model put the right information there.
 
 **Why this still works despite nonlinear attention/MLPs.**
+
 We’re not trying to *invert the whole transformer*; we’re training it **end‑to‑end** so that, after all the nonlinear mixing, the final hidden state ($h_T$) *writes the right clues into the right 4‑D slots* for our decoder to read. This is the same reason a vanilla GPT can use a simple **linear output head** after many nonlinear layers: the network learns a representation that is linearly decodable because the loss demands it. Here, our head is a slightly more structured linear reader: each 4‑D block in ($h_T$) is treated as a noisy “measurement” of the value under that block’s quaternion code; we **invert per block** to get votes, then **fuse** them (least‑squares/“Gaussian” mean) to produce a best guess and a confidence. Upstream nonlinearities don’t break this—they just change how the model *encodes* information internally; the loss on the decoded value pushes the model to **place recoverable signal** in those blocks so that the vote fusion is accurate (skinny bell curve when votes agree, wide when they don’t). In short: we don’t assume ($h_T$) equals the pre‑mix embedding; we **define a decodable head**, train against it, and the transformer learns to make the head’s job easy—exactly how large language models already learn to make a simple output layer work.
 
 
@@ -64,12 +65,13 @@ We’re not trying to *invert the whole transformer*; we’re training it **end�
 
 **1) Split into clues**
 Take the final hidden state and chop it into 4‑number blocks:
+
 $$
 \widehat{y}_0,\;\widehat{y}_1,\;\dots,\;\widehat{y}_{N_q-1}\in\mathbb{R}^4.
 $$
 
 **2) Per‑block vote**
-Each type (t) has its learned quaternions ($W^{(t)}_i$). “Undo” each code to get a vote for the value quaternion:
+Each type ($t$) has its learned quaternions ($W^{(t)}_i$). “Undo” each code to get a vote for the value quaternion:
 
 $$
 \widehat{q}_i = \widehat{y}_i \otimes \big(W^{(t)}_i\big)^{-1}
