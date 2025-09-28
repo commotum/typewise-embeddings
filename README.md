@@ -33,11 +33,12 @@ This turns “table lookup” into **structured math**—the parameters scale wi
   1. **Type set** (what kinds of tokens exist).
   2. **Mapping function** from a concrete value to its **Minimal Representation** (MR), usually one quaternion (4 numbers).
   3. **Weight Bank** ($W^{(t)}_1,\dots,W^{(t)}_{N_q}$) (quaternions) for the type, used to **up‑project** the MR to the model dimension by blockwise Hamilton products:
-     $$
-     \underbrace{Y}_{d_{\text{model}}}
-     = \mathrm{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
-     \quad N_q = d_{\text{model}}/4.
-     $$
+
+$$
+\underbrace{Y}_{d_{\text{model}}}
+= \mathrm{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
+\quad N_q = d_{\text{model}}/4.
+$$
 
 **Transformer body:** unchanged (standard attention + MLP blocks).
 
@@ -69,6 +70,7 @@ $$
 
 **2) Per‑block vote**
 Each type (t) has its learned quaternions ($W^{(t)}_i$). “Undo” each code to get a vote for the value quaternion:
+
 $$
 \widehat{q}_i = \widehat{y}_i \otimes \big(W^{(t)}_i\big)^{-1}
 = \widehat{y}_i \otimes \frac{\mathrm{conj}(W^{(t)}_i)}{\lvert W^{(t)}_i\rvert^2}.
@@ -77,26 +79,29 @@ $$
 **3) Fuse votes → best guess + confidence**
 
 * **Best guess (mean):**
-  $$
-  \boxed{\mu_q =
-  \frac{\sum_i \widehat{y}_i \otimes \mathrm{conj}(W^{(t)}_i)}
-  {\sum_i \lvert W^{(t)}_i\rvert^2}}
-  $$
+
+$$
+\boxed{\mu_q =
+\frac{\sum_i \widehat{y}_i \otimes \mathrm{conj}(W^{(t)}_i)}
+{\sum_i \lvert W^{(t)}_i\rvert^2}}
+$$
   (equivalently: a weighted average of the per‑block inverse votes with weights $\beta_i=\lvert W^{(t)}_i\rvert^2$).
 
 * **Confidence (variance):** how tightly the votes cluster. A simple, effective scalar:
-  $$
-  s^2 = \frac{\sum_i \beta_i \,\lvert\widehat{q}_i - \mu_q\rvert^2}{\sum_i \beta_i}.
-  $$
+
+$$
+s^2 = \frac{\sum_i \beta_i \,\lvert\widehat{q}_i - \mu_q\rvert^2}{\sum_i \beta_i}.
+$$
   Skinny bell curve (small $s^2$) → high confidence. Wide bell curve → low confidence.
 
 **4) From fuzzy guess to discrete values (no giant softmax)**
 
 * Convert $\mu_q$ to the float domain for RGB, then pick the **nearest few** bins per channel (e.g., 7 closest red, 7 green, 7 blue → ≤ 343 candidates).
 * **Score** each candidate color ($c$) by how well it explains the clues:
-  $$
-  \text{Score}(c) = -\sum_i \big\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\big\rvert^2.
-  $$
+
+$$
+\text{Score}(c) = -\sum_i \big\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\big\rvert^2.
+$$
 * Take **top‑k** or **sample** by a softmax over these scores.
 
 That’s it—**no comparison against millions** of rows.
@@ -124,6 +129,7 @@ Because the number of types is small, picking the discrete type from the type de
 Use a centered, power‑of‑two‑aligned grid so bf16 never collapses adjacent bins.
 
 **Map 8‑bit to $[-1,1]$ bin centers (purely imaginary quaternion):**
+
 $$
 \tilde{r}=\frac{2r-255}{256},\quad
 \tilde{g}=\frac{2g-255}{256},\quad
@@ -135,6 +141,7 @@ $$
 * Powers‑of‑two grid aligns with **bf16** spacing; adjacent 8‑bit codes remain distinct.
 
 **Map back to 8‑bit after decoding $\widehat{Q}=[0,\hat r,\hat g,\hat b]$:**
+
 $$
 \widehat{r}_{\text{8-bit}}=\operatorname{round}\!\left(\frac{256\,\hat r + 255}{2}\right)
 \quad\text{(and same for $g,b$); clamp to $[0,255]$.}
