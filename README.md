@@ -85,6 +85,7 @@ $$
 \frac{\sum_i \widehat{y}_i \otimes \mathrm{conj}(W^{(t)}_i)}
 {\sum_i \lvert W^{(t)}_i\rvert^2}}
 $$
+
   (equivalently: a weighted average of the per‑block inverse votes with weights $\beta_i=\lvert W^{(t)}_i\rvert^2$).
 
 * **Confidence (variance):** how tightly the votes cluster. A simple, effective scalar:
@@ -92,6 +93,7 @@ $$
 $$
 s^2 = \frac{\sum_i \beta_i \,\lvert\widehat{q}_i - \mu_q\rvert^2}{\sum_i \beta_i}.
 $$
+
   Skinny bell curve (small $s^2$) → high confidence. Wide bell curve → low confidence.
 
 **4) From fuzzy guess to discrete values (no giant softmax)**
@@ -102,6 +104,7 @@ $$
 $$
 \text{Score}(c) = -\sum_i \big\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\big\rvert^2.
 $$
+
 * Take **top‑k** or **sample** by a softmax over these scores.
 
 That’s it—**no comparison against millions** of rows.
