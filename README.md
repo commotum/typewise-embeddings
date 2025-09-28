@@ -36,7 +36,7 @@ This turns “table lookup” into **structured math**—the parameters scale wi
 
 $$
 \underbrace{Y}_{d_{\text{model}}}
-= \operatorname{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
+= \mathrm{vec}\big(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q}\big),
 \quad N_q = d_{\text{model}}/4.
 $$
 
@@ -73,7 +73,7 @@ Each type (t) has its learned quaternions ($W^{(t)}_i$). “Undo” each code to
 
 $$
 \widehat{q}_i = \widehat{y}_i \otimes \big(W^{(t)}_i\big)^{-1}
-= \widehat{y}_i \otimes \frac{\operatorname{conj}(W^{(t)}_i)}{\lvert W^{(t)}_i\rvert^2}.
+= \widehat{y}_i \otimes \frac{\mathrm{conj}(W^{(t)}_i)}{\lvert W^{(t)}_i\rvert^2}.
 $$
 
 **3) Fuse votes → best guess + confidence**
@@ -82,7 +82,7 @@ $$
 
 $$
 \boxed{\mu_q =
-\frac{\sum_i \widehat{y}_i \otimes \operatorname{conj}(W^{(t)}_i)}
+\frac{\sum_i \widehat{y}_i \otimes \mathrm{conj}(W^{(t)}_i)}
 {\sum_i \lvert W^{(t)}_i\rvert^2}}
 $$
 
@@ -102,7 +102,7 @@ $$
 * **Score** each candidate color ($c$) by how well it explains the clues:
 
 $$
-\operatorname{Score}(c) = -\sum_i \left\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\right\rvert^2.
+\mathrm{Score}(c) = -\sum_i \left\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\right\rvert^2.
 $$
 
 * Take **top‑k** or **sample** by a softmax over these scores.
@@ -146,7 +146,7 @@ $$
 **Map back to 8‑bit after decoding $\widehat{Q}=[0,\hat{r},\hat{g},\hat{b}]$:**
 
 $$
-\widehat{r}_{\text{8-bit}} = \operatorname{round}\!\left(\frac{256\,\hat{r} + 255}{2}\right)
+\widehat{r}_{\text{8-bit}} = \mathrm{round}\!\left(\frac{256\,\hat{r} + 255}{2}\right)
 \quad\text{(and same for }g,b\text{; clamp to }[0,255]\text{).}
 $$
 
