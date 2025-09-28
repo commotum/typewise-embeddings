@@ -1,9 +1,3 @@
-# typewise-embeddings
-
-Perfect—here’s a clean, README‑ready write‑up that explains the problem, what we replace, how the “voting/Gaussian” decoder works (with **no anchors and no readout**), your bf16‑friendly RGB↔quaternion mapping, and a glossary of names for an architecture diagram.
-
----
-
 # Type & Value Embeddings (Goodbye, Giant Tables)
 
 ## The problem
