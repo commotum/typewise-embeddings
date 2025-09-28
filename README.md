@@ -167,7 +167,7 @@ Everything autograds cleanly (just quaternion ops over real tensors).
 
 ## Why this works
 
-* Complexity is **$O(d_{\text{model}})$**, not $O(\#\text{values})$.
+* Complexity is **$O(d_{\text{model}})$**, not $O(|\text{values}|)$.
 * The decoder gives a **best guess and a confidence**, not just a number.
 * No giant tables; **no enumeration** over 16.7M colors—ever.
 
