@@ -32,7 +32,7 @@ This turns “table lookup” into **structured math**—the parameters scale wi
 
   1. **Type set** (what kinds of tokens exist).
   2. **Mapping function** from a concrete value to its **Minimal Representation** (MR), usually one quaternion (4 numbers).
-  3. **Weight Bank** ($W^{(t)}_1,\dots,W^{(t)}_{N_q}$) (quaternions) for the type, used to **up‑project** the MR to the model dimension by blockwise Hamilton products:
+  3. **Weight Bank** $\left(W^{(t)}_{1,\dots,N_q}\right)$ (quaternions) for the type, used to **up‑project** the MR to the model dimension by blockwise Hamilton products:
 
 $$
 \underbrace{Y}_{d_{\text{model}}}
@@ -220,7 +220,7 @@ $$
 
 * **Typewise Token** — a token represented as **(TYPE, VALUE)**.
 * **Minimal Representation (MR)** — the smallest structured form of a value (e.g., one **pure‑imaginary quaternion** ($[0,r,g,b]$) for RGB).
-* **Weight Bank** — per‑type list of learned **quaternions** ($W^{(t)}_{1,\dots,N_q}$) used for up‑projection.
+* **Weight Bank** — per‑type list of learned **quaternions** $\left(W^{(t)}_{1,\dots,N_q}\right)$ used for up‑projection.
 * **Quaternion Lift / Up‑Projection** — compute $Y = \operatorname{vec}\big(q \otimes W^{(t)}_i\big)_{i=1}^{N_q}$ to reach $d_{\text{model}}$.
 * **(Type|Value) Segment** — the slice of the hidden state reserved for decoding TYPE or VALUE (each a multiple of 4 dims).
 * **Block** — a 4‑D slice of a segment; corresponds to one quaternion.
