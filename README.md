@@ -226,7 +226,7 @@ $$
 * **$\mathcal{T}$** — the set of types; $|\mathcal{T}|$ is its size.
 * **Minimal Representation (MR)** — the smallest structured form of a value (e.g., one **pure‑imaginary quaternion** ($[0,r,g,b]$) for RGB).
 * **Weight Bank** — per‑type list of learned **quaternions** $\left(W^{(t)}_{1,\dots,N_q}\right)$ used for up‑projection.
-* **Quaternion Lift / Up‑Projection** — compute $Y = vec(q \otimes W_1^t, \ldots, q \otimes W_{N_q}^t)$ to reach $d_{\text{model}}$.
+* **Quaternion Lift / Up‑Projection** — compute $Y = \mathrm{vec}(q \otimes W^{(t)}_1,\dots,q \otimes W^{(t)}_{N_q})$ to reach $d_{\text{model}}$.
 * **(Type|Value) Segment** — the slice of the hidden state reserved for decoding TYPE or VALUE (each a multiple of 4 dims).
 * **Block** — a 4‑D slice of a segment; corresponds to one quaternion.
 * **Vote** — per‑block inverse estimate of the value: $\widehat{q}_i = \widehat{y}_i \otimes (W^{(t)}_i)^{-1}$.
