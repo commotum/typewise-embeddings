@@ -203,6 +203,7 @@ def decode_mu_and_spread(h_T, W_t, eps=1e-12):
 ```
 
 Use `mu_q` as the continuous estimate; do small **local search** in 8‑bit space and **rank** candidates by how well they re‑explain the blocks:
+
 $$
 -\sum_i \left\lvert\widehat{y}_i - q(c)\otimes W^{(t)}_i\right\rvert^2.
 $$
